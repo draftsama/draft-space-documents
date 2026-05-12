@@ -104,11 +104,18 @@ Add a `TextureFlow` component to any GameObject. Use the custom Inspector to:
 
 ## Async Support
 
-All major operations have async counterparts returning `Task<Texture2D>` (or `Task<byte[]>` for encoding). Operations run off the main thread where possible.
+Async encoding returns `Task<byte[]>`. For chained GPU operations, `TextureOperationChain.ExecuteAsync()` runs the full chain and returns `Task<Texture2D>`.
 
 ```csharp
-Texture2D result = await TextureProcessor.ResizeAsync(source, 1024, 1024);
+// Async encoding
 byte[] jpeg = await TextureProcessor.FastEncodeJPEGAsync(result, quality: 90);
+
+// Async chain execution
+Texture2D result = await TextureProcessor
+    .BeginChain(source)
+    .Resize(1024, 1024)
+    .CropCircle()
+    .ExecuteAsync();
 ```
 
 ---

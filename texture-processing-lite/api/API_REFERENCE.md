@@ -8,7 +8,7 @@ Unity: 2021.3+
 
 ## TextureProcessor
 
-The primary static entry point. All methods are synchronous unless suffixed with `Async`.
+The primary static entry point. All methods are synchronous. Async variants are only available for encoding (`FastEncodePNGAsync`, `FastEncodeJPEGAsync`) and chain execution (`TextureOperationChain.ExecuteAsync()`).
 
 ### Lifecycle
 
@@ -35,9 +35,6 @@ Texture2D FlipY(Texture2D source)
 ```csharp
 Texture2D Rotate(Texture2D source, float angleDegrees,
     RotationClipMode clipMode = RotationClipMode.Clip)
-
-Task<Texture2D> RotateAsync(Texture2D source, float angleDegrees,
-    RotationClipMode clipMode = RotationClipMode.Clip)
 ```
 
 **RotationClipMode**
@@ -53,10 +50,6 @@ Task<Texture2D> RotateAsync(Texture2D source, float angleDegrees,
 
 ```csharp
 Texture2D Resize(Texture2D source, int width, int height,
-    ResizeMode mode = ResizeMode.Stretch,
-    FilterMode filterMode = FilterMode.Bilinear)
-
-Task<Texture2D> ResizeAsync(Texture2D source, int width, int height,
     ResizeMode mode = ResizeMode.Stretch,
     FilterMode filterMode = FilterMode.Bilinear)
 
@@ -79,7 +72,6 @@ Texture2D Scale(Texture2D source, float scale,
 ```csharp
 // Rectangular crop — Rect in pixel coordinates
 Texture2D CropRect(Texture2D source, Rect cropRect)
-Task<Texture2D> CropRectAsync(Texture2D source, Rect cropRect)
 
 // Circular crop — optional radius in normalised [0,1] units
 Texture2D CropCircle(Texture2D source, float? radius = null)
@@ -92,16 +84,12 @@ Texture2D CropRoundedCorners(Texture2D source, Vector4 cornerRadii)
 
 // Polygon crop — points in normalised [0,1] x-right y-down space
 Texture2D CropPolygon(Texture2D source, Vector2[] points)
-Task<Texture2D> CropPolygonAsync(Texture2D source, Vector2[] points)
 
 // Texture mask — alpha channel of mask drives transparency
 Texture2D ApplyMask(Texture2D source, Texture2D mask, bool invert = false)
-Task<Texture2D> ApplyMaskAsync(Texture2D source, Texture2D mask, bool invert = false)
 
 // Aspect-ratio crop
 Texture2D CropAspectRatio(Texture2D source, float aspectRatio,
-    CropAnchor anchor = CropAnchor.Center)
-Task<Texture2D> CropAspectRatioAsync(Texture2D source, float aspectRatio,
     CropAnchor anchor = CropAnchor.Center)
 ```
 
@@ -115,8 +103,6 @@ Task<Texture2D> CropAspectRatioAsync(Texture2D source, float aspectRatio,
 
 ```csharp
 Texture2D Blend(Texture2D source1, Texture2D source2,
-    BlendMode blendMode, float opacity = 1.0f)
-Task<Texture2D> BlendAsync(Texture2D source1, Texture2D source2,
     BlendMode blendMode, float opacity = 1.0f)
 
 Texture2D Overlay(Texture2D baseTexture, Texture2D overlayTexture,
@@ -227,14 +213,12 @@ Extension methods on `Texture2D`. Mirror the static API with a `Fast` prefix.
 Texture2D  FastFlipX(this Texture2D)
 Texture2D  FastFlipY(this Texture2D)
 Texture2D  FastRotate(this Texture2D, float angle)
-Task<Texture2D> FastRotateAsync(this Texture2D, float angle)
 
 // Resize
 Texture2D  FastResize(this Texture2D, int width, int height, ResizeMode mode, FilterMode filterMode)
 Texture2D  FastResizeFit(this Texture2D, int maxWidth, int maxHeight)
 Texture2D  FastResizeFill(this Texture2D, int width, int height)
 Texture2D  FastScale(this Texture2D, float scale)
-Task<Texture2D> FastResizeAsync(this Texture2D, int width, int height, ...)
 
 // Crop
 Texture2D  FastCropRect(this Texture2D, Rect cropRect)
@@ -390,7 +374,7 @@ Polygon points, overlay positions, and warp source/destination points all follow
 ## Performance Notes
 
 - **Lazy initialisation** — compute shaders are loaded on first use. Call `TextureProcessor.Initialize()` at startup to avoid stutter.
-- **No main-thread blocking** — use `Async` variants when processing large textures to keep the frame rate stable.
+- **Async encoding** — use `FastEncodePNGAsync` / `FastEncodeJPEGAsync` to encode off the main thread. For chained operations use `TextureOperationChain.ExecuteAsync()`.
 - **Intermediate textures** — each chained operation produces a new `Texture2D`. For very long chains, consider using the `TextureOperationChain` which minimises unnecessary allocations.
 - **Thread groups** — all 2D dispatch kernels use 8×8 thread groups (`CeilToInt(dimension / 8)`), optimal for most modern GPUs.
 

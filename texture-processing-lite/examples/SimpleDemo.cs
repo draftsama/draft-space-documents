@@ -15,20 +15,23 @@ namespace Draft.TextureProcessing.Demo
             var flipped = TextureProcessor.FlipX(_sourceTexture);
 
             // Example: Resize the texture to 256x256 using Fit mode
-           var resized = await _sourceTexture.FastResizeAsync( 512, 512, TextureProcessor.ResizeMode.Fit);
+            var resized = flipped.FastResize(512, 512, TextureProcessor.ResizeMode.Fit);
 
-            // Example: Rotate the texture 90 degrees clockwise and rounded corners with radius 50
-            //var composited = resized.FastRotate(90).FastCropRounded(50);
-
+            // Example: Chain multiple operations: Rotate 90 degrees, then apply rounded corners with a radius of 50 pixels
+            var result = TextureProcessor.BeginChain(resized).Rotate(90).RoundedCorners(50).Execute();
+            
+            // Note: The chained version may be more efficient as it can optimize the sequence of operations internally, while the individual calls may create intermediate textures at each step.
+            //TextureProcessor.BeginChain(resized).Rotate(90).RoundedCorners(50).Execute(); vs resized.FastRotate(90).FastCropRoundedCorners(50);
+        
 
             //save composited texture to disk (for testing)
-            // var bytes = composited.EncodeToPNG();
-            // var savePath = System.IO.Path.Combine(Application.persistentDataPath, "output.png");
-            // await System.IO.File.WriteAllBytesAsync(savePath, bytes);
+            var bytes = result.EncodeToPNG();
+            var savePath = System.IO.Path.Combine(Application.persistentDataPath, "output.png");
+            await System.IO.File.WriteAllBytesAsync(savePath, bytes);
 
 
             // Display the result
-            _previewImage.texture = flipped;
+            _previewImage.texture = result;
 
             // Clean up shaders when done (optional)
             TextureProcessor.ReleaseShaders();
