@@ -26,26 +26,8 @@ Texture Processing Lite brings a full suite of GPU compute-shader-based texture 
 - **13 blend modes**: Alpha, Additive, Multiply, Screen, Overlay, Darken, Lighten, Color Dodge, Color Burn, Hard Light, Soft Light, Difference, Exclusion
 - **Overlay composite** — place a texture over a base with position, scale, and opacity control
 
-### Image Adjustments
-- Brightness, Contrast, Saturation, Grayscale
 
-### Image Effects
-- Blur (Gaussian separable, Box), Sharpen
-- Edge detection: Sobel, Canny (full multi-pass pipeline)
-- Morphology: Dilate, Erode
-- Threshold, Adaptive Threshold
-- Vignette, Color Matrix
-- Hue Shift, Hue Remap, Selective HSV
-- Chroma Key, In-Range mask
-- Median Blur, Bilateral Filter
-- CLAHE (Contrast Limited Adaptive Histogram Equalization)
-- Channel Separation, Texture Subtract, Texture Add
-
-### Geometric Transforms
-- **Perspective Warp** — 4-point homography, normalised coordinate space
-- **Affine Warp** — 3-point affine transform
-
-### Fast Encoding (Native Plugin — optional)
+### Fast Encoding 
 
 - **FastEncodePNG** / **FastEncodeJPEG** — 2–5× faster than Unity's built-in `EncodeToPNG`, runs on CPU using multi-threaded Rust (Rayon thread pool)
 - Works on `Texture2D` or raw `NativeArray<byte>` RGBA data
