@@ -380,20 +380,5 @@ Polygon points, overlay positions, and warp source/destination points all follow
 
 ---
 
-## Compute Shader Kernels Reference
-
-| Shader | Kernels |
-|--------|---------|
-| `TextureOperations` | FlipX, FlipY, Rotate, RotateExpand |
-| `TextureCrop` | CropRect, CropCircle, CropRoundedCorners |
-| `TextureAdvancedCrop` | CropPolygon, ApplyMask, CropAspectRatio |
-| `TextureCombine` | BlendAlpha, BlendAdditive, BlendMultiply, BlendScreen, BlendOverlay, BlendDarken, BlendLighten, BlendColorDodge, BlendColorBurn, BlendHardLight, BlendSoftLight, BlendDifference, BlendExclusion, Overlay |
-| `TextureAdjustments` | AdjustBrightness, AdjustContrast, AdjustSaturation, Grayscale |
-| `TextureEffects` | BlurHorizontal, BlurVertical, BoxBlur, Sharpen, SobelEdgeDetection, Dilate, Erode, Threshold, AdaptiveThreshold, ChannelSeparation, ColorMatrix, Vignette, HueShift, CannyGradient, CannyNMS, CannyHysteresisInit, CannyHysteresisSpread, InRange, ChromaKey, HueRemap, SelectiveHSV, MedianBlur, SubtractTextures, BilateralFilter, CLAHEHistogram, CLAHENormalize, CLAHEApply |
-| `TextureWarp` | ComputeHomography, WarpPerspective, WarpAffine |
-| `TextureMath` | AddTextures, SubtractTextures |
-| `TextureBitwise` | (bitwise channel operations) |
-
----
 
 *API Reference — Texture Processing Lite*
