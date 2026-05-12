@@ -1,2 +1,2 @@
 - [GitHub](https://github.com/draftsama)
-- [Unity Asset Store](https://assetstore.unity.com)
+- [Unity Asset Store](https://assetstore.unity.com/publishers/25431)
