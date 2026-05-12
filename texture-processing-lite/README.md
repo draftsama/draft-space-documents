@@ -27,12 +27,14 @@ Texture Processing Lite brings a full suite of GPU compute-shader-based texture 
 - **Overlay composite** — place a texture over a base with position, scale, and opacity control
 
 
-### Fast Encoding 
+### Fast Encoding
 
-- **FastEncodePNG** / **FastEncodeJPEG** — 2–5× faster than Unity's built-in `EncodeToPNG`, powered by a native multi-threaded Rust encoder (Rayon). Async variants run on a background thread — main thread stays free, no frame drops.
+- **FastEncodePNGAsync** / **FastEncodeJPEGAsync** — encoding runs entirely on a **background thread**, so the main thread is never blocked — no frame drops, no freezes.
+- Unity's built-in `EncodeToPNG` / `EncodeToJPG` block the main thread; these don't.
+- Powered by a native Rust encoder (Rayon multi-threading) — CPU encoding work happens off-thread.
 - Works on `Texture2D` or raw `NativeArray<byte>` RGBA data
-- Fully async variants available (`Task<byte[]>`)
-- Save directly to file: `FastSavePNG`, `FastSaveJPEG`
+- Returns `Task<byte[]>` — fully awaitable
+- Save directly to file: `FastSavePNGAsync`, `FastSaveJPEGAsync`
 
 ### Pipeline System (TextureFlow)
 - `TextureFlow` MonoBehaviour — drag-and-drop visual pipeline in the Inspector
@@ -65,11 +67,11 @@ Texture2D result = myTexture
     .FastCropCircle()
     .FastBlend(overlayTex, TextureProcessor.BlendMode.Screen, 0.5f);
 
-// Save to disk
-myTexture.FastSavePNG("/path/to/output.png");
-
-// Async
+// Encode on background thread — no freeze
 byte[] pngBytes = await myTexture.FastEncodePNGAsync();
+
+// Save to file (also async)
+await myTexture.FastSavePNGAsync("/path/to/output.png");
 ```
 
 ### 3. Fluent Chain Builder

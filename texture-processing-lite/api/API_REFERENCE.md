@@ -8,7 +8,7 @@ Unity: 2021.3+
 
 ## TextureProcessor
 
-The primary static entry point. All methods are synchronous. Async variants are only available for encoding (`FastEncodePNGAsync`, `FastEncodeJPEGAsync`) and chain execution (`TextureOperationChain.ExecuteAsync()`).
+The primary static entry point. All GPU operations are synchronous (main-thread GPU dispatch). Encoding is **async-only** (`FastEncodePNGAsync`, `FastEncodeJPEGAsync`). Chain execution supports async via `TextureOperationChain.ExecuteAsync()`.
 
 ### Lifecycle
 
@@ -117,21 +117,17 @@ Texture2D Overlay(Texture2D baseTexture, Texture2D overlayTexture,
 
 ---
 
-### Fast Encoding (requires native plugin — multi-threaded CPU)
+### Fast Encoding (requires native plugin — background thread, no main-thread freeze)
+
+All encoding methods are **async-only**. Encoding work runs on a background thread — the main thread is never blocked, unlike Unity's built-in `EncodeToPNG` / `EncodeToJPG`.
 
 ```csharp
 // PNG
-byte[] FastEncodePNG(Texture2D texture, int quality = 85)
 Task<byte[]> FastEncodePNGAsync(Texture2D texture, int quality = 85)
-
-byte[] FastEncodePNG(NativeArray<byte> rgbaData, int width, int height, int quality = 85)
 Task<byte[]> FastEncodePNGAsync(NativeArray<byte> rgbaData, int width, int height, int quality = 85)
 
 // JPEG
-byte[] FastEncodeJPEG(Texture2D texture, int quality = 85)
 Task<byte[]> FastEncodeJPEGAsync(Texture2D texture, int quality = 85)
-
-byte[] FastEncodeJPEG(NativeArray<byte> rgbaData, int width, int height, int quality = 85)
 Task<byte[]> FastEncodeJPEGAsync(NativeArray<byte> rgbaData, int width, int height, int quality = 85)
 
 // Encoder lifecycle
@@ -232,11 +228,7 @@ Texture2D  FastCropAspectRatio(this Texture2D, float aspectRatio, CropAnchor anc
 Texture2D  FastBlend(this Texture2D, Texture2D other, BlendMode blendMode, float opacity)
 Texture2D  FastOverlay(this Texture2D, Texture2D overlayTexture, Vector2? position, Vector2? scale, float opacity)
 
-// Encoding & saving (requires native plugin)
-byte[]     FastEncodePNG(this Texture2D, int quality = 85)
-byte[]     FastEncodeJPEG(this Texture2D, int quality = 85)
-bool       FastSavePNG(this Texture2D, string filePath, int quality = 85)
-bool       FastSaveJPEG(this Texture2D, string filePath, int quality = 85)
+// Encoding & saving (requires native plugin — background thread, no freeze)
 Task<byte[]>  FastEncodePNGAsync(this Texture2D, int quality = 85)
 Task<byte[]>  FastEncodeJPEGAsync(this Texture2D, int quality = 85)
 Task<bool>    FastSavePNGAsync(this Texture2D, string filePath, int quality = 85)
