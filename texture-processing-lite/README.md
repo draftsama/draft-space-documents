@@ -29,7 +29,7 @@ Texture Processing Lite brings a full suite of GPU compute-shader-based texture 
 
 ### Fast Encoding 
 
-- **FastEncodePNG** / **FastEncodeJPEG** — 2–5× faster than Unity's built-in `EncodeToPNG`, runs on CPU using multi-threaded Rust (Rayon thread pool)
+- **FastEncodePNG** / **FastEncodeJPEG** — 2–5× faster than Unity's built-in `EncodeToPNG`, powered by a native multi-threaded Rust encoder (Rayon). Async variants run on a background thread — main thread stays free, no frame drops.
 - Works on `Texture2D` or raw `NativeArray<byte>` RGBA data
 - Fully async variants available (`Task<byte[]>`)
 - Save directly to file: `FastSavePNG`, `FastSaveJPEG`
