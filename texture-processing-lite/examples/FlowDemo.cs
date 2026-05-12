@@ -28,7 +28,7 @@ namespace Draft.TextureProcessing.Demo
 
 
                 var savePath = System.Environment.CurrentDirectory + "/0001.png";
-                var success = await result.FastSavePNGAsync(savePath);
+                var success = await result.SavePNGAsync(savePath);
 
                 if (success)
                 {
