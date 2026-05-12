@@ -46,7 +46,8 @@ Texture Processing Lite brings a full suite of GPU compute-shader-based texture 
 - **Affine Warp** — 3-point affine transform
 
 ### Fast Encoding (Native Plugin — optional)
-- **FastEncodePNG** / **FastEncodeJPEG** — Rust-powered encoder, significantly faster than Unity's built-in `EncodeToPNG`
+
+- **FastEncodePNG** / **FastEncodeJPEG** — 2–5× faster than Unity's built-in `EncodeToPNG`, runs on CPU using multi-threaded Rust (Rayon thread pool)
 - Works on `Texture2D` or raw `NativeArray<byte>` RGBA data
 - Fully async variants available (`Task<byte[]>`)
 - Save directly to file: `FastSavePNG`, `FastSaveJPEG`

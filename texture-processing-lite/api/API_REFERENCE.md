@@ -131,7 +131,7 @@ Texture2D Overlay(Texture2D baseTexture, Texture2D overlayTexture,
 
 ---
 
-### Fast Encoding (requires native plugin)
+### Fast Encoding (requires native plugin — multi-threaded CPU)
 
 ```csharp
 // PNG
