@@ -27,14 +27,12 @@ Texture Processing Lite brings a full suite of GPU compute-shader-based texture 
 - **Overlay composite** — place a texture over a base with position, scale, and opacity control
 
 
-### Fast Encoding
+### Texture Helper Functions
 
-- **FastEncodePNGAsync** / **FastEncodeJPEGAsync** — encoding runs entirely on a **background thread**, so the main thread is never blocked — no frame drops, no freezes.
-- Unity's built-in `EncodeToPNG` / `EncodeToJPG` block the main thread; these don't.
-- Powered by a native Rust encoder (Rayon multi-threading) — CPU encoding work happens off-thread.
-- Works on `Texture2D` or raw `NativeArray<byte>` RGBA data
-- Returns `Task<byte[]>` — fully awaitable
-- Save directly to file: `FastSavePNGAsync`, `FastSaveJPEGAsync`
+- **`EncodePNGAsync`** / **`EncodeJPEGAsync`** — encoding runs entirely on a **background thread**, so the main thread is never blocked — no frame drops, no freezes, Unity's built-in `EncodeToPNG` / `EncodeToJPG` block the main thread; these don't.
+- **`SavePNGAsync`** / **`SaveJPEGAsync`** — async convenience methods that combine encoding + file writing in one call.
+- **`LoadAsTextureAsync`** — load an image from disk (background thread) or URL (`UnityWebRequest` coroutine) into a `Texture2D`
+
 
 ### Pipeline System (TextureFlow)
 - `TextureFlow` MonoBehaviour — drag-and-drop visual pipeline in the Inspector
@@ -68,10 +66,10 @@ Texture2D result = myTexture
     .FastBlend(overlayTex, TextureProcessor.BlendMode.Screen, 0.5f);
 
 // Encode on background thread — no freeze
-byte[] pngBytes = await myTexture.FastEncodePNGAsync();
+byte[] pngBytes = await myTexture.EncodePNGAsync();
 
 // Save to file (also async)
-await myTexture.FastSavePNGAsync("/path/to/output.png");
+await myTexture.SavePNGAsync("/path/to/output.png");
 ```
 
 ### 3. Fluent Chain Builder
@@ -104,34 +102,17 @@ Add a `TextureFlow` component to any GameObject. Use the custom Inspector to:
 
 ---
 
-## Async Support
-
-Async encoding returns `Task<byte[]>`. For chained GPU operations, `TextureOperationChain.ExecuteAsync()` runs the full chain and returns `Task<Texture2D>`.
-
-```csharp
-// Async encoding
-byte[] jpeg = await TextureProcessor.FastEncodeJPEGAsync(result, quality: 90);
-
-// Async chain execution
-Texture2D result = await TextureProcessor
-    .BeginChain(source)
-    .Resize(1024, 1024)
-    .CropCircle()
-    .ExecuteAsync();
-```
-
----
 
 ## Platform Support
 
-| Platform | GPU Operations | Fast Encoding |
-|----------|----------------|---------------|
-| Windows (DX11/DX12) | ✅ | ✅ |
-| macOS (Metal) | ✅ | ✅ |
-| iOS (Metal) | ✅ | ✅ |
-| Android (Vulkan / OpenGL ES 3.1+) | ✅ | ✅ |
-| Linux (Vulkan) | ✅ | — |
-| WebGL | ❌ | ❌ |
+| Platform | GPU Operations |
+|----------|----------------|
+| Windows (DX11/DX12) | ✅ |
+| macOS (Metal) | ✅ | 
+| iOS (Metal) | ✅ | 
+| Android (Vulkan / OpenGL ES 3.1+) | ✅ | 
+| Linux (Vulkan) | ✅ | 
+| WebGL | ❌ | 
 
 > GPU operations require compute shader support. WebGL does not support compute shaders.
 
@@ -142,8 +123,6 @@ Texture2D result = await TextureProcessor
 - **Unity**: 2021.3 LTS or newer
 - **Render Pipeline**: Built-in, URP, or HDRP (compute shaders are render-pipeline agnostic)
 - **GPU**: Compute shader support (DX11+, Metal, Vulkan, OpenGL ES 3.1+)
-
-Fast Encoding uses an optional native Rust plugin. Pre-built binaries for Windows, macOS, iOS, and Android are included. The plugin is only required for `FastEncodePNG` / `FastEncodeJPEG`; all other operations work without it.
 
 ---
 
@@ -220,3 +199,4 @@ All normalised coordinates use **x-right, y-down**, origin at **top-left**, matc
 ---
 
 *Texture Processing Lite — clean API, GPU speed, zero boilerplate.*
+

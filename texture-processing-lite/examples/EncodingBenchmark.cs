@@ -18,21 +18,28 @@ public class EncodingBenchmark : MonoBehaviour
         //delay a bit to ensure any initialization overhead is out of the way
         await Task.Delay(100);
 
-        // Unity sync
         var sw = Stopwatch.StartNew();
-
-        // Async: measure only how long the main thread is stalled before background work takes over
         byte[] bytes = null;
+
+        for (int i = 0; i < iterations; i++)
+        {
+            bytes = sourceTexture.EncodeToPNG();
+           Debug.Log($"Iteration {i + 1}/{iterations} completed, main thread was blocked until encoding finished.");
+        }
+
+        Debug.Log($"[Unity Built-in] EncodeToPNG : {sw.Elapsed.TotalMilliseconds / iterations:F2} ms avg, {bytes.Length / 1024} KB");
+        Debug.Log("===================================");
+        sw.Restart();
 
         for (int i = 0; i < iterations; i++)
         {
             var task = sourceTexture.EncodePNGAsync();
             bytes = await task;
-            Debug.Log($"  Iteration {i + 1}/{iterations} completed on background thread, main thread was not blocked.");
+            Debug.Log($"Iteration {i + 1}/{iterations} completed on background thread, main thread was not blocked.");
         }
         sw.Stop();
 
-        Debug.Log($"[Fast] EncodePNGAsync main-thread stall: {sw.Elapsed.TotalMilliseconds / iterations:F2} ms avg (encoding runs on background thread), {bytes.Length / 1024} KB");
+        Debug.Log($"[Texture Processing] EncodePNGAsync : {sw.Elapsed.TotalMilliseconds / iterations:F2} ms avg (encoding runs on background thread), {bytes.Length / 1024} KB");
 
         System.IO.File.WriteAllBytes(System.Environment.CurrentDirectory + "/unity_result.png", bytes);
 

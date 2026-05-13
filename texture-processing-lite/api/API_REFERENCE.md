@@ -8,7 +8,7 @@ Unity: 2021.3+
 
 ## TextureProcessor
 
-The primary static entry point. All GPU operations are synchronous (main-thread GPU dispatch). Encoding is **async-only** (`FastEncodePNGAsync`, `FastEncodeJPEGAsync`). Chain execution supports async via `TextureOperationChain.ExecuteAsync()`.
+The primary static entry point. All GPU operations are synchronous (main-thread GPU dispatch). Encoding is handled via extension methods (`EncodePNGAsync`, `EncodeJPEGAsync`) on `Texture2D` — see `TextureExtensions`. Chain execution supports async via `TextureOperationChain.ExecuteAsync()`.
 
 ### Lifecycle
 
@@ -117,23 +117,16 @@ Texture2D Overlay(Texture2D baseTexture, Texture2D overlayTexture,
 
 ---
 
-### Fast Encoding (requires native plugin — background thread, no main-thread freeze)
+### Async Encoding
 
-All encoding methods are **async-only**. Encoding work runs on a background thread — the main thread is never blocked, unlike Unity's built-in `EncodeToPNG` / `EncodeToJPG`.
+Encoding is exposed as extension methods on `Texture2D` (see `TextureExtensions`), not as static methods on `TextureProcessor`. Encoding runs on a background thread via `Task.Run` using Unity's `ImageConversion` API — the main thread is never blocked, unlike Unity's built-in `EncodeToPNG` / `EncodeToJPG`. No native plugin required.
 
 ```csharp
-// PNG
-Task<byte[]> FastEncodePNGAsync(Texture2D texture, int quality = 85)
-Task<byte[]> FastEncodePNGAsync(NativeArray<byte> rgbaData, int width, int height, int quality = 85)
-
-// JPEG
-Task<byte[]> FastEncodeJPEGAsync(Texture2D texture, int quality = 85)
-Task<byte[]> FastEncodeJPEGAsync(NativeArray<byte> rgbaData, int width, int height, int quality = 85)
-
-// Encoder lifecycle
-void InitializeEncoder()
-void ShutdownEncoder()
-string GetEncoderVersion()
+// Available as extension methods on Texture2D:
+Task<byte[]> EncodePNGAsync(this Texture2D texture)
+Task<byte[]> EncodeJPEGAsync(this Texture2D texture, int quality = 85)
+Task<bool>   SavePNGAsync(this Texture2D texture, string filePath)
+Task<bool>   SaveJPEGAsync(this Texture2D texture, string filePath, int quality = 85)
 ```
 
 ---
@@ -202,7 +195,7 @@ Texture2D avatar = await TextureProcessor
 
 ## TextureExtensions
 
-Extension methods on `Texture2D`. Mirror the static API with a `Fast` prefix.
+Extension methods on `Texture2D`. Transform/crop/blend methods use a `Fast` prefix; encoding/saving/load methods do not.
 
 ```csharp
 // Transform
@@ -228,11 +221,11 @@ Texture2D  FastCropAspectRatio(this Texture2D, float aspectRatio, CropAnchor anc
 Texture2D  FastBlend(this Texture2D, Texture2D other, BlendMode blendMode, float opacity)
 Texture2D  FastOverlay(this Texture2D, Texture2D overlayTexture, Vector2? position, Vector2? scale, float opacity)
 
-// Encoding & saving (requires native plugin — background thread, no freeze)
-Task<byte[]>  FastEncodePNGAsync(this Texture2D, int quality = 85)
-Task<byte[]>  FastEncodeJPEGAsync(this Texture2D, int quality = 85)
-Task<bool>    FastSavePNGAsync(this Texture2D, string filePath, int quality = 85)
-Task<bool>    FastSaveJPEGAsync(this Texture2D, string filePath, int quality = 85)
+// Encoding & saving (background thread via Task.Run, no native plugin required)
+Task<byte[]>  EncodePNGAsync(this Texture2D)
+Task<byte[]>  EncodeJPEGAsync(this Texture2D, int quality = 85)
+Task<bool>    SavePNGAsync(this Texture2D, string filePath)
+Task<bool>    SaveJPEGAsync(this Texture2D, string filePath, int quality = 85)
 
 // Load
 Task<Texture2D> LoadAsTextureAsync(this string pathOrUrl)
@@ -366,7 +359,7 @@ Polygon points, overlay positions, and warp source/destination points all follow
 ## Performance Notes
 
 - **Lazy initialisation** — compute shaders are loaded on first use. Call `TextureProcessor.Initialize()` at startup to avoid stutter.
-- **Async encoding** — use `FastEncodePNGAsync` / `FastEncodeJPEGAsync` to encode off the main thread. For chained operations use `TextureOperationChain.ExecuteAsync()`.
+- **Async encoding** — use `EncodePNGAsync` / `EncodeJPEGAsync` (extension methods on `Texture2D`) to encode off the main thread. For chained operations use `TextureOperationChain.ExecuteAsync()`.
 - **Intermediate textures** — each chained operation produces a new `Texture2D`. For very long chains, consider using the `TextureOperationChain` which minimises unnecessary allocations.
 - **Thread groups** — all 2D dispatch kernels use 8×8 thread groups (`CeilToInt(dimension / 8)`), optimal for most modern GPUs.
 
