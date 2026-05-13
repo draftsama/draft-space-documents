@@ -198,5 +198,8 @@ All normalised coordinates use **x-right, y-down**, origin at **top-left**, matc
 
 ---
 
+## ONLINE DOCUMENTATION
+[Documentation Hub](https://draftsama.github.io/draft-space-documents/#/texture-processing-lite/README)
+
 *Texture Processing Lite — clean API, GPU speed, zero boilerplate.*
 
