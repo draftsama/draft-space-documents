@@ -203,4 +203,4 @@ Assets/Draft/ScreenRecorder/
 
 For bug reports and questions: [draft.sama@gmail.com](mailto:draft.sama@gmail.com)
 
-Full API documentation: [API_REFERENCE.md](./api/API_REFERENCE)
+Full API documentation: [API_REFERENCE.md](./api/API_REFERENCE.md)
