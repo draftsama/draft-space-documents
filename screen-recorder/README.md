@@ -194,8 +194,13 @@ Assets/Draft/ScreenRecorder/
 
 ---
 
+## ONLINE DOCUMENTATION
+[Documentation Hub](https://draftsama.github.io/draft-space-documents/#/screen-recorder/README)
+
+---
+
 ## Support
 
 For bug reports and questions: [draft.sama@gmail.com](mailto:draft.sama@gmail.com)
 
-Full API documentation: [API_REFERENCE.md](./API_REFERENCE.md)
+Full API documentation: [API_REFERENCE.md](./api/API_REFERENCE)
